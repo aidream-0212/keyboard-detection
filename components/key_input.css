@@ -1,0 +1,34 @@
+.box {
+  min-height: 2.6rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--st-border-color);
+  border-radius: var(--st-base-radius);
+  background: var(--st-secondary-background-color);
+  color: var(--st-text-color);
+  font-family: var(--st-code-font);
+  font-size: 1.1rem;
+  line-height: 1.6rem;
+  cursor: text;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.box:focus {
+  border-color: var(--st-primary-color);
+  box-shadow: 0 0 0 1px var(--st-primary-color);
+}
+
+.typed {
+  white-space: pre;
+}
+
+.hint {
+  opacity: 0.55;
+  font-family: var(--st-font);
+  font-size: 0.95rem;
+}
+
+/* 글자를 치기 시작하면 안내 문구를 숨긴다 */
+.box.has-text .hint {
+  display: none;
+}
