@@ -1,0 +1,14 @@
+# 가상환경
+.venv/
+
+# 수집 데이터 (커밋하지 않는다)
+data/
+*.db
+
+# 접속 키 (커밋하지 않는다)
+.streamlit/secrets.toml
+.env
+
+# 파이썬 캐시
+__pycache__/
+.pytest_cache/

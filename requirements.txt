@@ -1,0 +1,6 @@
+# 설치: pip install -r requirements.txt
+# (supabase 는 P2 단계에서 추가한다)
+streamlit==1.67.0
+numpy==2.5.5
+psutil==7.2.2
+pytest==9.2.0
