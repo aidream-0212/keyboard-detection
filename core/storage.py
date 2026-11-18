@@ -14,9 +14,25 @@ ATTEMPT_COLUMNS = [
 ]
 
 
+def new_path_state():
+    """경로 하나(포인터)의 처음 상태. 키보드 경로와 같은 이름의 값을 쓴다."""
+    return {
+        "enroll_rows": [],
+        "calib_scores": [],
+        "mean": None,
+        "std": None,
+        "tau": None,
+        "counter": 0,
+        "last_score": None,
+        "excluded": {"enroll": {}, "calibrate": {}, "monitor": {}},
+    }
+
+
 def new_state():
     """아무것도 하지 않은 처음 상태."""
     return {
+        "pointer": new_path_state(),  # 포인터 경로 (P5)
+        "reauth_cause": None,   # 재인증을 부른 경로: keyboard / pointer
         "enroll_rows": [],      # 등록 시도들의 특징(19개씩)
         "calib_scores": [],     # 보정 시도들의 점수
         "mean": None,           # 등록 모델: 특징별 평균
@@ -36,7 +52,11 @@ def load_state(path=STATE_PATH):
     """저장된 상태를 읽는다. 파일이 없으면 처음 상태를 돌려준다."""
     if not path.exists():
         return new_state()
-    return json.loads(path.read_text(encoding="utf-8"))
+    state = json.loads(path.read_text(encoding="utf-8"))
+    # P5 이전에 저장된 파일에는 포인터 경로가 없다. 키보드 기록은 그대로 두고 빈 자리만 채운다.
+    state.setdefault("pointer", new_path_state())
+    state.setdefault("reauth_cause", None)
+    return state
 
 
 def save_state(state, path=STATE_PATH):
