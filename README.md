@@ -4,7 +4,7 @@
 
 현재 단계는 **P3** 입니다. 1페이지(키보드 행동 탐지)가 이 노트북 안에서 끝까지 동작하고,
 보안 이벤트를 모의 Edge Server(Supabase)로 보내 2페이지에서 봅니다.
-3페이지에서 통신 단절을 흉내 내고 복구 후 전달을 확인합니다. 4페이지는 "준비 중" 입니다.
+3페이지에서 통신 단절을 흉내 내고 복구 후 전달을 확인합니다. 4페이지에서 자원·전력을 봅니다.
 
 ## 준비물
 
@@ -58,7 +58,7 @@ streamlit run app.py
 pytest
 ```
 
-`67 passed` 처럼 실패 없이 모두 통과하면 정상입니다. 시험은 네트워크 없이 돕니다.
+`82 passed` 처럼 실패 없이 모두 통과하면 정상입니다. 시험은 네트워크 없이 돕니다.
 
 ## 1페이지 사용 순서
 
@@ -104,6 +104,23 @@ Supabase 가 Edge Server 의 저장소 역할을 대신합니다. 재인증이 �
 - 스위치를 끄거나 네트워크가 돌아오면, 앱이 열려 있는 동안 약 5초 안에 자동으로 보냅니다. "지금 재전송" 버튼도 있습니다.
 - 전달 시간표에서 발생 시각과 서버 수신 시각을 나란히 보고 늦게 도착한 이벤트를 확인합니다.
 
+## 4페이지: 자원·전력과 측정 도구
+
+4페이지는 측정 조건, 앱 프로세스의 실시간 CPU·메모리, 시도별 처리 시간 통계, 조건별 측정 결과 표를 보여줍니다.
+조건별 결과는 아래 측정 도구로 만듭니다. 결과는 `power_experiment/` 에 저장되고 커밋하지 않습니다.
+
+```
+python tools/power_monitor.py check
+python tools/power_monitor.py run idle --seconds 60
+python tools/power_monitor.py run detection --seconds 60
+python tools/power_monitor.py run reauth --seconds 60
+python tools/power_monitor.py run edge --seconds 60
+```
+
+- 전력은 Windows Energy Meter Interface(EMI)에서 읽힌 값만 씁니다. 읽을 수 없으면 "측정 불가"입니다.
+- 이 노트북(i7-1065G7)의 EMI 값은 CPU 패키지 전력(RAPL)이며, 노트북 전체 전력이 아닙니다.
+- CPU 사용률을 W 로 바꾸지 않습니다.
+
 ## 기록 파일 (`data/`, 커밋하지 않음)
 
 | 파일 | 내용 |
@@ -134,6 +151,8 @@ Supabase 가 Edge Server 의 저장소 역할을 대신합니다. 재인증이 �
 | `views/admin.py` | 2페이지 화면 |
 | `core/link.py`, `core/delivery.py` | 통신 상태 저장, 재전송 판단과 알림 |
 | `views/ddil.py`, `views/link_status.py` | 3페이지 화면, 사이드바·1페이지 상태 줄과 자동 재전송 |
+| `views/resources.py`, `core/resources.py` | 4페이지 화면, 처리 시간 통계와 조건별 결과 표 |
+| `tools/power_monitor.py` | 자원·전력 측정 도구 (CPU·메모리, Windows EMI 전력) |
 | `supabase/schema.sql` | 서버 테이블 구조 기록 |
 | `tests/` | pytest 시험 |
 | `PROGRESS.md` | 진행 상황 (완료 / 미정 / 다음 한 단계) |

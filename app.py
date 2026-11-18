@@ -5,7 +5,7 @@
 
 import streamlit as st
 
-from views import admin, ddil, detect
+from views import admin, ddil, detect, resources
 from views.link_status import sidebar_status
 
 # 왼쪽 메뉴에 보일 네 개의 페이지 제목
@@ -40,4 +40,4 @@ elif selected == PAGES[1]:
 elif selected == PAGES[2]:
     ddil.show()
 else:
-    show_page(selected)
+    resources.show()
