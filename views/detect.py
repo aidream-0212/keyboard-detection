@@ -10,6 +10,7 @@ from components.key_input import key_input
 from core import model, session, storage
 from core.events import record_security_event
 from core.pin import hash_pin, is_valid_pin
+from views.link_status import status_line
 
 STEP_LABELS = {
     "enroll": "1. 등록",
@@ -24,6 +25,7 @@ def show():
     """페이지 전체를 그린다."""
     st.title("1 키보드 행동 탐지")
     st.session_state.setdefault("last_attempt_id", 0)
+    status_line()  # 전송 상태 한 줄. 아래의 탐지·재인증·접근 제한은 이것과 무관하다
     show_flash()
 
     state = storage.load_state()

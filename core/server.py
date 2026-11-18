@@ -9,7 +9,7 @@ from pathlib import Path
 import psycopg
 
 SECRETS_PATH = Path(__file__).parent.parent / ".streamlit" / "secrets.toml"
-CONNECT_TIMEOUT = 5  # 초. 서버가 안 잡혀도 화면이 오래 멈추지 않게 한다
+CONNECT_TIMEOUT = 3  # 초. 서버가 안 잡혀도 화면이 오래 멈추지 않게 한다
 
 INSERT_SQL = """
 insert into public.security_events
@@ -61,6 +61,19 @@ def make_sender(path=SECRETS_PATH):
         send_event(database_url, payload)
 
     return send
+
+
+def make_pinger(path=SECRETS_PATH):
+    """서버에 연결만 해 보는 함수를 만든다. 접속 정보가 없으면 None."""
+    database_url = load_database_url(path)
+    if database_url is None:
+        return None
+
+    def ping():
+        with psycopg.connect(database_url, connect_timeout=CONNECT_TIMEOUT) as conn:
+            conn.execute("select 1")
+
+    return ping
 
 
 def fetch_events(database_url, limit=200):

@@ -110,7 +110,7 @@ def test_payload_has_only_the_five_allowed_fields(tmp_path):
 def test_recorded_event_goes_through_outbox_with_only_allowed_fields(tmp_path):
     fake = FakeServer()
     event = events.record_security_event(
-        "SUCCESS", tmp_path / "events.csv", tmp_path / "outbox.db", fake.send
+        "SUCCESS", tmp_path / "events.csv", tmp_path / "outbox.db", fake.send, tmp_path / "link.json"
     )
     assert len(fake.payloads) == 1
     assert set(fake.payloads[0]) == ALLOWED_FIELDS
@@ -124,7 +124,9 @@ def test_recording_works_when_sending_fails(tmp_path):
     fake.online = False
     outbox_path = tmp_path / "outbox.db"
 
-    event = events.record_security_event("FAILURE", tmp_path / "events.csv", outbox_path, fake.send)
+    event = events.record_security_event(
+        "FAILURE", tmp_path / "events.csv", outbox_path, fake.send, tmp_path / "link.json"
+    )
 
     assert event["reauth_result"] == "FAILURE"
     assert len(storage.read_csv_rows(tmp_path / "events.csv")) == 1
@@ -148,7 +150,9 @@ def test_reauth_result_is_the_same_whether_sending_succeeds_or_fails(tmp_path):
         for _ in range(3):
             result = session.submit_reauth_pin(state, "0000")
         folder = tmp_path / str(online)
-        events.record_security_event(result, folder / "events.csv", folder / "outbox.db", fake.send)
+        events.record_security_event(
+            result, folder / "events.csv", folder / "outbox.db", fake.send, folder / "link.json"
+        )
         final_states.append((result, state["status"], state["counter"], state["pin_failures"]))
 
     assert final_states[0] == final_states[1]

@@ -5,7 +5,7 @@ Supabase 가 Edge Server 의 저장소 역할을 대신한다(모의).
 
 import streamlit as st
 
-from core import server
+from core import link, server
 
 RESULT_LABELS = {"SUCCESS": "🟢 재인증 성공", "FAILURE": "🔴 재인증 실패"}
 
@@ -14,6 +14,11 @@ def show():
     """페이지 전체를 그린다."""
     st.title("2 Edge Server 관리자")
     st.caption("(모의) Supabase 가 Edge Server 의 저장소 역할을 대신합니다.")
+    if link.is_disconnected():
+        st.info(
+            "단말과 Edge Server 사이가 통신 단절(모의) 상태입니다. "
+            "이 화면은 서버 쪽 기록이라, 단말의 미전송 이벤트는 연결이 돌아온 뒤에 나타납니다."
+        )
 
     database_url = server.load_database_url()
     if database_url is None:
