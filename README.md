@@ -2,8 +2,8 @@
 
 키보드 행동(H/UD) 기반 사용자 변경 탐지 실습 프로젝트입니다. (AIoT 수업 실습 자료)
 
-현재 단계는 **P1** 입니다. 1페이지(키보드 행동 탐지)가 이 노트북 안에서 끝까지 동작합니다.
-서버 전송은 아직 없고, 2~4페이지는 "준비 중" 입니다.
+현재 단계는 **P2** 입니다. 1페이지(키보드 행동 탐지)가 이 노트북 안에서 끝까지 동작하고,
+보안 이벤트를 모의 Edge Server(Supabase)로 보내 2페이지에서 봅니다. 3~4페이지는 "준비 중" 입니다.
 
 ## 준비물
 
@@ -57,7 +57,7 @@ streamlit run app.py
 pytest
 ```
 
-`30 passed` 처럼 모두 통과하면 정상입니다.
+`41 passed` 처럼 모두 통과하면 정상입니다. 시험은 네트워크 없이 돕니다.
 
 ## 1페이지 사용 순서
 
@@ -72,6 +72,21 @@ pytest
 
 Backspace 사용, 키 순서 틀림, 키 뗌 누락, CapsLock 켜짐인 시도는 사유와 함께 제외되고 채점하지 않습니다.
 
+## 2페이지와 서버 전송 (모의 Edge Server)
+
+Supabase 가 Edge Server 의 저장소 역할을 대신합니다. 재인증이 끝나면 보안 이벤트 한 건이
+로컬(`data/outbox.db`)에 먼저 저장되고, 그다음 서버로 전송됩니다.
+서버로 가는 값은 event_id, 발생시각, 단말 ID, 이벤트 유형, 재인증 결과 다섯 가지뿐입니다.
+
+1. Supabase 의 SQL Editor 에서 `supabase/schema.sql` 을 한 번 실행합니다.
+2. `.streamlit/secrets.toml` 을 만들고 접속 주소를 넣습니다(이 파일은 커밋되지 않습니다).
+
+   ```toml
+   DATABASE_URL = "postgresql://사용자:비밀번호@호스트:5432/postgres"
+   ```
+
+접속 정보가 없거나 서버에 닿지 않아도 1페이지는 그대로 동작합니다. 2페이지는 연결하지 못했다고 알려줍니다.
+
 ## 기록 파일 (`data/`, 커밋하지 않음)
 
 | 파일 | 내용 |
@@ -79,6 +94,7 @@ Backspace 사용, 키 순서 틀림, 키 뗌 누락, CapsLock 켜짐인 시도�
 | `data/state.json` | 등록·보정 결과, tau, PIN 해시, 현재 상태 |
 | `data/attempts.csv` | 시도 기록 (시각, 단계, 사용 가능 여부, 제외 사유, 점수, tau, 이상 여부, 카운터, 처리 시간, 교대 표시 번호) |
 | `data/security_events.csv` | 재인증이 끝날 때마다 한 줄 (event_id, 발생시각, 단말 ID, 이벤트 유형, 재인증 결과) |
+| `data/outbox.db` | 서버로 보낼 이벤트와 보냄 여부 (SQLite) |
 
 등록부터 다시 하려면 앱을 끄고 `data/state.json` 을 지운 뒤 다시 실행합니다.
 
@@ -93,7 +109,10 @@ Backspace 사용, 키 순서 틀림, 키 뗌 누락, CapsLock 켜짐인 시도�
 | `core/model.py` | 등록, 점수, 임계값, K 카운터 |
 | `core/session.py` | 단계 진행, 재인증, 접근 제한 |
 | `core/pin.py` | 시험용 PIN 해시 |
-| `core/storage.py`, `core/events.py` | 로컬 기록 |
+| `core/storage.py`, `core/events.py` | 로컬 기록, 보안 이벤트 남기기 |
+| `core/outbox.py`, `core/server.py` | 로컬에 먼저 저장 후 전송, 서버 접속 |
+| `views/admin.py` | 2페이지 화면 |
+| `supabase/schema.sql` | 서버 테이블 구조 기록 |
 | `tests/` | pytest 시험 |
 | `PROGRESS.md` | 진행 상황 (완료 / 미정 / 다음 한 단계) |
 | `AGENTS.md` | 프로젝트 규칙 |

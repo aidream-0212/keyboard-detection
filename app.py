@@ -5,7 +5,7 @@
 
 import streamlit as st
 
-from views import detect
+from views import admin, detect
 
 # 왼쪽 메뉴에 보일 네 개의 페이지 제목
 PAGES = [
@@ -29,5 +29,7 @@ selected = st.sidebar.radio("메뉴", PAGES)
 
 if selected == PAGES[0]:
     detect.show()
+elif selected == PAGES[1]:
+    admin.show()
 else:
     show_page(selected)

@@ -1,6 +1,7 @@
 # 설치: pip install -r requirements.txt
-# (supabase 는 P2 단계에서 추가한다)
 streamlit==1.67.0
 numpy==2.5.5
 psutil==7.2.2
 pytest==9.2.0
+# Supabase(PostgreSQL)에 연결 문자열로 직접 접속하기 위한 패키지 (P2)
+psycopg[binary]==3.3.9

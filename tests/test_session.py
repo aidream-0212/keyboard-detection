@@ -137,8 +137,13 @@ def test_attempt_log_has_header_once_and_reads_back(tmp_path):
 
 def test_security_event_has_only_the_five_allowed_fields(tmp_path):
     path = tmp_path / "security_events.csv"
-    events.record_security_event("SUCCESS", path)
-    events.record_security_event("FAILURE", path)
+    outbox_path = tmp_path / "outbox.db"
+
+    def fake_send(payload):  # 시험에서는 진짜 서버로 보내지 않는다
+        pass
+
+    events.record_security_event("SUCCESS", path, outbox_path, fake_send)
+    events.record_security_event("FAILURE", path, outbox_path, fake_send)
 
     rows = storage.read_csv_rows(path)
     assert list(rows[0].keys()) == [
